@@ -1,76 +1,101 @@
-# Deep Reinforcement Learning with CartPole in Pytorch
-## About
-This repository explores 3 different Reinforcement Learning Algorithms using Deep Learning in Pytorch. The methods used here include Deep Q Learning (DQN), Policy Gradient Learning (REINFORCE), and Advantage Actor-Critic (A2C). The goal of the agent is to balance a pole on a cart for the maximum amount of time possible without it falling over. The task and documentation can be found at OpenAI Gym: https://gym.openai.com/envs/CartPole-v0/ 
+# Deep Reinforcement Learning - DQN with CartPole in PyTorch
 
-<p align="center">
-  <img src="saved_dqn_cartpole/movie.gif" width="280">
-  <img src="saved_reinforce_cartpole/movie.gif" width="280">
-  <img src="saved_a2c_cartpole/movie.gif" width="280">
-</p>
+## 📌 About
+This project implements a **Deep Q-Network (DQN)** agent using **PyTorch** to solve the **CartPole-v1** environment from OpenAI Gym.  
+The objective is for the agent to learn to balance a pole on a moving cart for as long as possible by taking discrete actions (move left or right).
 
-## Models
-### Model: DQN
-The Deep Q-Network (DQN) is implemented as a simple feedforward network with two hidden layers of size 128 and 64, respectively. 
-<p align="center">
-  <img src="saved_dqn_cartpole/movie.gif" width="400">
-  <img src="saved_dqn_cartpole/plot_rewards.png" width="450">
-</p>
+---
 
-### Model: REINFORCE
-The Policy-Gradient Network (REINFORCE) is implemented as a simple feedforward network with a single hidden layer of size 128 and output size equal to that of the action space. A dropout layer of 0.6 is placed in the intermediate layer.
-<p align="center">
-  <img src="saved_reinforce_cartpole/movie.gif" width="400">
-  <img src="saved_reinforce_cartpole/plot_rewards.png" width="450">
-</p>
+## 🚀 Model Architecture
+The DQN agent uses a simple feedforward neural network:
+- **Input:** 4 features (cart position, cart velocity, pole angle, pole angular velocity)
+- **Hidden Layers:** 
+  - Layer 1: 128 neurons + ReLU
+  - Dropout: 0.7
+  - Layer 2: 64 neurons + ReLU
+- **Output:** Q-values for two possible actions (left or right)
 
-### Model: A2C
-The Advantage Actor-Critic (A2C) consists of 2 modules, an actor and a critic. The actor has a hidden layer of size 128 and output size equal to that of the action space. A dropout layer of 0.7 is placed in the intermediate layer. The critic has a hidden layer of size 128 and output size of 1. 
-<p align="center">
-  <img src="saved_a2c_cartpole/movie.gif" width="400">
-  <img src="saved_a2c_cartpole/plot_rewards.png" width="450">
-</p>
+The agent is trained using the Mean Squared Error (MSE) loss between predicted and target Q-values, with experience replay.
 
+---
 
-## Code
-### Layout
-Files are named in the format name-of-model.py and corresponding folders are name-of-model/, containing plots, models, and videos of trained agents performing the CartPole task.
+## 🏗 Code Structure
+- `DQN_cartpole.py` : Main Python script containing
+  - Model definition
+  - Training loop
+  - Evaluation / Running loop
+  - Plotting of training metrics
+- Outputs generated during training:
+  - Plots of Loss and Rewards over Episodes (`plot_loss.png`, `plot_rewards.png`)
+  - Trained model weights (`model.pt`)
 
-### Run
-The code is designed to be run easily and effectively for a wide variety of use cases. Knowing the flags is helpful in determining the appropriate command to run: 
-* **--device**: cuda device, if one exists. Default 0
-* **--verbose**: printing preferences, set to 1. Default 1
-* **--load**: set to True if loading a model. If this is set to True, the model specified in directory flag --model is used. Default False
-* **--save**: set to True if saving a model. Default False
-* **--plot**: set to True if plotting the learning curves after training. Default True. 
-* **--model**: the directory of the model to load, if --load Flag is set to True
-* **--runtype**: choose from ('train_run', 'train', 'run'), corresponding with both training and running after training, training only, or running the model (consists of saving a video of the run). For training on a server without GLX support or where env.render() is unavailable, use 'train' only. Default 'train_run'
-* **--lr**: the learning rate of the model. Defaults are different for different models.
-* **--episodes**: the number of episodes for which the model will be trained
-* **--gamma**: the discount factor
+---
 
-### Examples
-Below are examples for how to run the code in a variety of use cases. Here, I'm using dqn_cartpole.py but the same formatting applies to the other two models as well. 
+## ⚙️ How to Run
+The project uses **command-line arguments** for flexibility.
 
-**Simple Train and Run (save output model, 500 episodes):** 
+### ✅ Key arguments
+| Argument    | Description                                       | Default   |
+|-------------|---------------------------------------------------|-----------|
+| `--device`  | CUDA device if available                          | `0`       |
+| `--verbose` | Print detailed progress logs                      | `1`       |
+| `--load`    | Load a previously trained model                   | `False`   |
+| `--save`    | Save the trained model weights                    | `False`   |
+| `--plot`    | Plot and save training graphs                     | `True`    |
+| `--model`   | Path to load or save model weights                | `'reinforce_cartpole/model.pt'` |
+| `--runtype` | `'train_run'`, `'train'`, or `'run'`              | `'train_run'` |
+| `--lr`      | Learning rate                                     | `0.001`   |
+| `--episodes`| Number of training episodes                       | `500`     |
+| `--gamma`   | Discount factor for future rewards                | `0.99`    |
 
-    python dqn_cartpole.py --save=True --episodes=500
+---
 
-**Train Only - useful for server-side training, to be rendered on a screen (save output model, 500 episodes):**
+### 🏃 Examples
 
-    python dqn_cartpole.py --runtype=train --episodes=500
-    
-**Load Existing Model (save output model, 500 episodes):**
-    
-    python dqn_cartpole.py --load=True --model= path/to/model --save=True --episodes=500
+#### 🔥 Train and Run (500 episodes), save the model
+python DQN_cartpole.py --save=True --episodes=500
+#### 🛠 Train Only (no rendering, for servers)
+python DQN_cartpole.py --runtype=train --episodes=500
 
-**Load Existing Model and Run Only:** 
+#### 🚀 Run only using a saved model
+python DQN_cartpole.py --runtype=run --load=True --model=path/to/model.pt
 
-    python dqn_cartpole.py --runtype=run --load=True --model = path/to/model --save=False
+---
 
+## 🎯 Environment
+- **CartPole-v1** from [OpenAI Gym](https://gym.openai.com/envs/CartPole-v1/)
 
-## References
-Refer below for some fantastic tutorials on the topic, without which this code would not be possible:
-* https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
-* https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
-* https://medium.com/@ts1829/policy-gradient-reinforcement-learning-in-pytorch-df1383ea0baf
-* https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
+### ⚙ State Space (4 features)
+1. Cart Position
+2. Cart Velocity
+3. Pole Angle
+4. Pole Angular Velocity
+
+### 🎮 Action Space (Discrete)
+- `0`: Move cart to the left
+- `1`: Move cart to the right
+
+---
+
+## 🖼 Outputs
+- 📈 `plot_loss.png` : Shows how the loss changes over episodes.
+- 🏆 `plot_rewards.png` : Shows episode rewards and moving average.
+- 🧠 `model.pt` : Saved trained model weights.
+
+These are saved under automatically created timestamped folders in `dqn_cartpole/`.
+
+---
+
+## 📚 References
+- [PyTorch Q-learning Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html)
+- [Towards Data Science - Actor Critic Methods](https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f)
+
+---
+
+✅ **This repository focuses only on DQN with CartPole.**  
+Future work may explore Policy Gradients (REINFORCE) or Actor-Critic (A2C).
+
+---
+
+### 🚀 Author
+> Neha Parvathaneni
